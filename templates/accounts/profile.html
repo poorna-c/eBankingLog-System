@@ -1,0 +1,18 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content  %}
+<section class="container mt-5">
+    <h3>Welcome {{logged_in_user}},</h3>
+    <h4>Account balance : {{balance}}</h4>
+    <ul>
+        <li>
+            <a href="{% url 'account_details_page' %}">Account Details</a></li>
+        <li>
+            <a href="{% url 'transactions_page' %}">Transactions</a></li>
+        <li>
+            <a href="{% url 'transfer_funds_page' %}">Transfer Funds</a>
+        </li>
+    </ul>
+</section>
+{% endblock %}

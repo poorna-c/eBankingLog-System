@@ -1,0 +1,11 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<section class="container mt-5">
+    <h3>Login</h3>
+    <form action="" method="POST">
+        {% csrf_token %} {{ form.as_p }}
+        <input type="submit" value="submit">
+    </form>
+    
+</section>
+{% endblock %}

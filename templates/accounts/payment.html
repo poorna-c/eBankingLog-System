@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h3>Payment Confirmation</h3>
+    <p>An OTP with 6 Digits has been sent to your Registered mobile number</p>
+    <form action="{% url 'complete_transaction_page' %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="" id="">
+        <input type="hidden" name="to_acc" id="" value="{{to_acc}}">
+        <input type="hidden" name="amt" id="" value="{{amt}}">
+        <input type="hidden" name="ifsc" id="" value="{{ifsc}}">
+        <input type="submit">
+    </form>
+</body>
+
+</html>

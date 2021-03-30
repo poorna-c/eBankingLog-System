@@ -1,0 +1,14 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<section class="container mt-5"><body>
+    <h3>Fund Transfer</h3>
+    <br>
+    <h5>Avaliable balance: {{balance}}</h5>
+    <form action="{% url 'payment_page' %}" method="POST">
+        {% csrf_token %} Account No: <input type="text" name="to_acc" id="">
+        <br><br> IFSC: <input type="text" name="ifsc" id="" disabled>
+        <br><br> Amount: <input type="number" name="amt" id="">
+        <br><br> <input type="submit">
+    </form>
+</section>
+{% endblock %}

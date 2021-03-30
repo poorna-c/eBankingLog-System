@@ -1,0 +1,22 @@
+{% extends 'accounts/base.html' %}
+{% block content %}
+<section class="container mt-5">
+    <table class="table table-bordered table-primary">
+        <tr class="table-success">
+            <th class="table-success">Date-Time</th>
+            <th class="table-success">Description</th>
+            <th class="table-success">Amount</th>
+            <th class="table-success">Type</th>
+        </tr>
+        {% for i in transactions %}
+        <tr class="table-primary">
+            <td class="table-light">{{i.date_time}}</td>
+            <td class="table-light">{{i.transaction_description}}</td>
+            <td class="table-light">{{i.amount}}</td>
+            <td class="table-light">{{i.transaction_type}}</td>
+        </tr>
+        {% endfor%} 
+    </table> 
+    
+</section>
+{% endblock %}
