@@ -89,9 +89,9 @@ def complete_transaction(request):
 
 def send_otp(mobile):
     otp = ''.join([str(random.randint(0,9)) for i in range(6)])
-    account_sid = 'AC8690168f29333da2f520c3570971047f' 
-    auth_token = '30ea0b47d7c566890bf90b0ab5ac0ab2' 
+    account_sid = '[YOUR ACCOUNT SID]' 
+    auth_token = '[YOUR AUTH TOKEN]' 
     client = Client(account_sid, auth_token) 
-    message = client.messages.create(messaging_service_sid='MG4968383b3ef6e3918d766e6d9ef2cf4a', to='+91'+str(mobile),body='Your OTP is '+ str(otp))
+    message = client.messages.create(messaging_service_sid='[YOUR MSG SERVICE SID]', to='+91'+str(mobile),body='Your OTP is '+ str(otp))
     print(message.sid,"OTP SENT TO",mobile)
     return otp
