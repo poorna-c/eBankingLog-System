@@ -51,7 +51,7 @@ def payment(request):
         to_bank_acc = BankAccounts.objects.get(account_no=to_acc)
         if to_bank_acc:
             sent_otp = send_otp(to_bank_acc.mobile_number)
-            return render(request,'accounts/payment.html',{'amt':amt,'to_acc':to_acc,'ifsc':ifsc,'sent_otp':send_otp})
+            return render(request,'accounts/payment.html',{'amt':amt,'to_acc':to_acc,'ifsc':ifsc,'sent_otp':sent_otp})
         else:
             return render(request,'accounts/transfer_funds.html')
 
@@ -63,35 +63,46 @@ def complete_transaction(request):
         to_acc = BankAccounts.objects.get(account_no= int(request.POST.get('to_acc')))
         ifsc = request.POST.get("ifsc")
         amt = int(request.POST.get('amt'))
+        otp = int(request.POST.get('otp'))
+        otp_sent = int(request.POST.get('sent_otp'))
+        if validate_otp(otp,otp_sent):
+                
+            from_acc = BankAccounts.objects.get(user_link=request.user)
+            from_acc.account_balance -= amt
+            from_acc.save()
+            pt_from_acc = PastTransactions(transaction_description="Being Transfer to "+str(to_acc.name),amount=amt,transaction_type="DEBIT")
+            pt_from_acc.save()
+            pt_from_acc.account_no_link.add(from_acc)
+            pt_from_acc.save()
 
-        from_acc = BankAccounts.objects.get(user_link=request.user)
-        from_acc.account_balance -= amt
-        from_acc.save()
-        pt_from_acc = PastTransactions(transaction_description="Being Transfer to "+str(to_acc.name),amount=amt,transaction_type="DEBIT")
-        pt_from_acc.save()
-        pt_from_acc.account_no_link.add(from_acc)
-        pt_from_acc.save()
+            to_acc.account_balance += amt
+            to_acc.save()
+            pt_to_acc = PastTransactions(transaction_description="Being Transfer from "+str(from_acc.name),amount=amt,transaction_type="CREDIT")
+            pt_to_acc.save()
+            pt_to_acc.account_no_link.add(to_acc)
+            pt_to_acc.save()           
 
-        to_acc.account_balance += amt
-        to_acc.save()
-        pt_to_acc = PastTransactions(transaction_description="Being Transfer from "+str(from_acc.name),amount=amt,transaction_type="CREDIT")
-        pt_to_acc.save()
-        pt_to_acc.account_no_link.add(to_acc)
-        pt_to_acc.save()
-
-        logged_in_user = request.user
-        ba = BankAccounts.objects.get(user_link=logged_in_user)
-        
-        return redirect('dashboard_page')
+            logged_in_user = request.user
+            ba = BankAccounts.objects.get(user_link=logged_in_user)
+            return render(request, "accounts/transaction_success.html",{'bal':ba.account_balance})
+        else:
+            return render(request, "accounts/transaction_fail.html")
 
         
 
 
 def send_otp(mobile):
     otp = ''.join([str(random.randint(0,9)) for i in range(6)])
-    account_sid = '[YOUR ACCOUNT SID]' 
-    auth_token = '[YOUR AUTH TOKEN]' 
+    account_sid = 'AC8690168f29333da2f520c3570971047f' 
+    auth_token = 'a2c861b28e15af94d0cd1aae5943b4ea' 
     client = Client(account_sid, auth_token) 
-    message = client.messages.create(messaging_service_sid='[YOUR MSG SERVICE SID]', to='+91'+str(mobile),body='Your OTP is '+ str(otp))
+    message = client.messages.create(messaging_service_sid='MG4968383b3ef6e3918d766e6d9ef2cf4a', to='+91'+str(mobile),body='Your OTP is '+ str(otp))
     print(message.sid,"OTP SENT TO",mobile)
     return otp
+
+
+def validate_otp(otp,otp_sent):
+    if otp == otp_sent:
+        return True
+    else:
+        return False
