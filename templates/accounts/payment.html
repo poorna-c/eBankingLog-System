@@ -13,10 +13,11 @@
     <p>An OTP with 6 Digits has been sent to your Registered mobile number</p>
     <form action="{% url 'complete_transaction_page' %}" method="post">
         {% csrf_token %}
-        <input type="text" name="" id="">
+        <input type="text" name="otp" id="">
         <input type="hidden" name="to_acc" id="" value="{{to_acc}}">
         <input type="hidden" name="amt" id="" value="{{amt}}">
         <input type="hidden" name="ifsc" id="" value="{{ifsc}}">
+        <input type="hidden" name="sent_otp" id="" value="{{sent_otp}}">
         <input type="submit">
     </form>
 </body>
