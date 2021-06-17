@@ -51,7 +51,8 @@ def payment(request):
         to_bank_acc = BankAccounts.objects.get(account_no=to_acc)
         if to_bank_acc:
             sent_otp = send_otp(to_bank_acc.mobile_number)
-            return render(request,'accounts/payment.html',{'amt':amt,'to_acc':to_acc,'ifsc':ifsc,'sent_otp':send_otp})
+            context={'amt':amt,'to_acc':to_acc,'ifsc':ifsc,'sent_otp':sent_otp}
+            return render(request,'accounts/payment.html',context=context)
         else:
             return render(request,'accounts/transfer_funds.html')
 
@@ -60,24 +61,26 @@ def payment(request):
 
 def complete_transaction(request):
     if request.method == 'POST':
-        to_acc = BankAccounts.objects.get(account_no= int(request.POST.get('to_acc')))
-        ifsc = request.POST.get("ifsc")
-        amt = int(request.POST.get('amt'))
+        # print(request.POST.get('sent_otp'),request.POST.get('entered_otp'))
+        if request.POST.get('sent_otp') == request.POST.get('entered_otp'):
+            to_acc = BankAccounts.objects.get(account_no= int(request.POST.get('to_acc')))
+            ifsc = request.POST.get("ifsc")
+            amt = int(request.POST.get('amt'))
 
-        from_acc = BankAccounts.objects.get(user_link=request.user)
-        from_acc.account_balance -= amt
-        from_acc.save()
-        pt_from_acc = PastTransactions(transaction_description="Being Transfer to "+str(to_acc.name),amount=amt,transaction_type="DEBIT")
-        pt_from_acc.save()
-        pt_from_acc.account_no_link.add(from_acc)
-        pt_from_acc.save()
+            from_acc = BankAccounts.objects.get(user_link=request.user)
+            from_acc.account_balance -= amt
+            from_acc.save()
+            pt_from_acc = PastTransactions(transaction_description="Being Transfer to "+str(to_acc.name),amount=amt,transaction_type="DEBIT")
+            pt_from_acc.save()
+            pt_from_acc.account_no_link.add(from_acc)
+            pt_from_acc.save()
 
-        to_acc.account_balance += amt
-        to_acc.save()
-        pt_to_acc = PastTransactions(transaction_description="Being Transfer from "+str(from_acc.name),amount=amt,transaction_type="CREDIT")
-        pt_to_acc.save()
-        pt_to_acc.account_no_link.add(to_acc)
-        pt_to_acc.save()
+            to_acc.account_balance += amt
+            to_acc.save()
+            pt_to_acc = PastTransactions(transaction_description="Being Transfer from "+str(from_acc.name),amount=amt,transaction_type="CREDIT")
+            pt_to_acc.save()
+            pt_to_acc.account_no_link.add(to_acc)
+            pt_to_acc.save()
 
         logged_in_user = request.user
         ba = BankAccounts.objects.get(user_link=logged_in_user)
